@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Текст Мессеж</string>
+    <string name="sendNumber">Дугаараа оруулна уу...</string>
+    <string name="sendBtn">Илгээх</string>
+    <string name="msgField">Текст оруулна уу...</string>
+    <string name="sentSmsList">Одоогоор надад ирсэн мессежүүд:</string>
+</resources>
