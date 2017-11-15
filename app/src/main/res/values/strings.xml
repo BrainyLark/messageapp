@@ -8,4 +8,5 @@
     <string name="writeSimInfo">Симний мэдээлэл бичих</string>
     <string name="readSimInfo">Симний мэдээлэл унших</string>
     <string name="stopMechReceivers">Механик receivers зогсоох</string>
+    <string name="resultLogData">Log өгөгдлийг дэлгэцлэх</string>
 </resources>

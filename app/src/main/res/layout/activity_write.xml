@@ -6,24 +6,66 @@
     android:layout_height="match_parent"
     tools:context="com.archer.lab08.WriteActivity">
 
-    <Button
-        android:id="@+id/writeSimInfoBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:onClick="writeSimData"
-        android:text="@string/writeSimInfo"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <Button
-        android:id="@+id/readSimInfoBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="readSimData"
-        android:text="@string/readSimInfo"
-        app:layout_constraintStart_toStartOf="@+id/writeSimInfoBtn"
-        app:layout_constraintTop_toBottomOf="@+id/writeSimInfoBtn" />
+        <Button
+            android:id="@+id/writeSimInfoBtn"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:onClick="writeSimData"
+            android:text="@string/writeSimInfo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/readSimInfoBtn"
+            android:layout_width="253dp"
+            android:layout_height="wrap_content"
+            android:onClick="readSimData"
+            android:text="@string/readSimInfo"
+            app:layout_constraintStart_toStartOf="@+id/writeSimInfoBtn"
+            app:layout_constraintTop_toBottomOf="@+id/writeSimInfoBtn" />
+
+        <Button
+            android:id="@+id/readLogBtn"
+            android:layout_width="252dp"
+            android:layout_height="wrap_content"
+            android:onClick="readLogData"
+            android:text="@string/resultLogData" />
+
+        <ScrollView
+            android:id="@+id/scrollView2"
+            style="@android:style/Widget.Holo.Light.ScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/logDataField"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+        </ScrollView>
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

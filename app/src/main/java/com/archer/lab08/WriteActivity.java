@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedInputStream;
@@ -28,6 +29,9 @@ public class WriteActivity extends AppCompatActivity {
 
     private OutputStream outStream;
     private InputStream inStream;
+    private OutputStream logOutputStream;
+    private InputStream logInputStream;
+
     private TelephonyManager telephonyManager;
     private static final int PERMISSION_REQUEST_CODE = 1;
     private String simFileContents = null;
@@ -39,12 +43,14 @@ public class WriteActivity extends AppCompatActivity {
     public BroadcastReceiver powerDisconnected;
 
     private Calendar calendar;
-    private Intent batteryStatus;
+
+    TextView logDataField;
 
     public void initializeWriter() {
         try {
             outStream = new BufferedOutputStream(openFileOutput("sInfo.txt", MODE_PRIVATE));
             inStream = new BufferedInputStream(openFileInput("sInfo.txt"));
+            logOutputStream = new BufferedOutputStream(openFileOutput("logdata.txt", MODE_APPEND));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -70,7 +76,9 @@ public class WriteActivity extends AppCompatActivity {
                 calendar = Calendar.getInstance();
                 String minute = Integer.toString(calendar.get(Calendar.MINUTE));
                 if(calendar.get(Calendar.MINUTE) % 5 == 0) {
-                    Toast.makeText(getApplicationContext(), "Time: " + calendar.get(Calendar.HOUR_OF_DAY) + ":" + minute, Toast.LENGTH_LONG).show();
+                    String tickData = "Time: " + calendar.get(Calendar.HOUR_OF_DAY) + ":" + minute;
+                    writeLogData(tickData + "\n");
+                    Toast.makeText(getApplicationContext(), tickData, Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(getApplicationContext(), "Current minute (not divisible by 5): " + minute, Toast.LENGTH_LONG).show();
                 }
@@ -86,6 +94,7 @@ public class WriteActivity extends AppCompatActivity {
             public void onReceive(Context context, Intent intent) {
                 calendar = Calendar.getInstance();
                 String timeChanged = "Time Changed: " + calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE);
+                writeLogData(timeChanged + "\n");
                 Toast.makeText(getApplicationContext(), timeChanged, Toast.LENGTH_LONG).show();
             }
         };
@@ -98,6 +107,7 @@ public class WriteActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
+                writeLogData("Boot completed at: " + timeStamp + "\n");
                 Toast.makeText(getApplicationContext(), "Boot completed at: " + timeStamp, Toast.LENGTH_LONG).show();
             }
         };
@@ -110,6 +120,7 @@ public class WriteActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String timeStamp = new SimpleDateFormat("yyyy-MM-dd:HH-mm-ss").format(new Date());
+                writeLogData("Power connected at: " + timeStamp + "\n");
                 Toast.makeText(getApplicationContext(), "Power connected at: " + timeStamp, Toast.LENGTH_LONG).show();
             }
         };
@@ -121,10 +132,10 @@ public class WriteActivity extends AppCompatActivity {
         powerDisconnected = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-                int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-                float batteryPercent = (level * 100) / (float) scale;
-                Toast.makeText(context, "Current battery percent: " + batteryPercent, Toast.LENGTH_SHORT).show();
+                BatteryManager bm = (BatteryManager) getSystemService(BATTERY_SERVICE);
+                int prct = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+                writeLogData("Current battery percent: " + prct + "\n");
+                Toast.makeText(getApplicationContext(), "Current battery percent: " + prct, Toast.LENGTH_SHORT).show();
             }
         };
         IntentFilter filter = new IntentFilter(Intent.ACTION_POWER_DISCONNECTED);
@@ -135,7 +146,6 @@ public class WriteActivity extends AppCompatActivity {
         initTickReceiver();
         initTimeReceiver();
         initBootReceiver();
-        batteryStatus = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         initPowerConnected();
         initPowerDisconnected();
     }
@@ -146,6 +156,38 @@ public class WriteActivity extends AppCompatActivity {
         unregisterReceiver(bootReceiver);
         unregisterReceiver(powerConnected);
         unregisterReceiver(powerDisconnected);
+    }
+
+    public void writeLogData(String data) {
+        try {
+            logOutputStream.write(data.getBytes());
+            logOutputStream.flush();
+            Toast.makeText(this, "Data written", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void readLogData(View view) {
+        try {
+            logInputStream = new BufferedInputStream(openFileInput("logdata.txt"));
+            byte[] data = new byte[logInputStream.available()];
+            logInputStream.read(data, 0, logInputStream.available());
+            String logData = new String(data);
+            logDataField.setText(logData);
+            logInputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void closeStreams() {
+        try {
+            logOutputStream.close();
+            Toast.makeText(WriteActivity.this, "Streams are successfully closed!", Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void writeSimData(View view) throws FileNotFoundException {
@@ -184,6 +226,7 @@ public class WriteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_write);
         telephonyManager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+        logDataField = (TextView) findViewById(R.id.logDataField);
         initializePermissions();
         initializeWriter();
         initializeReceivers();
@@ -193,6 +236,7 @@ public class WriteActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         stopReceivers();
+        closeStreams();
     }
 
 }
