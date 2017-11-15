@@ -4,4 +4,8 @@
     <string name="sendBtn">Илгээх</string>
     <string name="msgField">Текст оруулна уу...</string>
     <string name="sentSmsList">Одоогоор надад ирсэн мессежүүд:</string>
+    <string name="stateSaver">Төлөв Хадгалагч</string>
+    <string name="writeSimInfo">Симний мэдээлэл бичих</string>
+    <string name="readSimInfo">Симний мэдээлэл унших</string>
+    <string name="stopMechReceivers">Механик receivers зогсоох</string>
 </resources>
